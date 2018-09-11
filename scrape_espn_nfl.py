@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import lxml
 import requests
 
-test_game_id = '401030690'
+test_game_id = '401030775'
 
 def get_game_ids():
     """
@@ -42,14 +42,19 @@ def parse_gamepage(game_id):
 
     return gamepage_soup
 
+print('Title, GameID, Week#, Time, Home, Home Win %, Away, Away Win %')
+for game_id, week, time in get_game_ids():
+    game = parse_gamepage(game_id)
 
-# for game_id, week, time in get_game_ids():
-#     print(f'{game_id}, {week}, {time}')
+    game_title = game.find_all('title')[0].text
 
-game = parse_gamepage(test_game_id)
+    home_team = game.find('span', {'class': 'home-team'}).text
+    away_team = game.find('span', {'class': 'away-team'}).text
 
-game_title = game.find_all('title')
+    home_win_pct = game.find('span', {'class': 'value-home'}).text
+    away_win_pct = game.find('span', {'class': 'value-away'}).text
 
-
+    print(f'{game_title}, {game_id}, {week}, {time}, {home_team}, '
+          f'{home_win_pct}, {away_team}, {away_win_pct}')
 moo = 'boo'
 

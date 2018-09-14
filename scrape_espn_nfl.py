@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import csv
 import lxml
 import requests
+import datetime
 
 test_game_id = '401030775'
 
@@ -37,6 +38,15 @@ def parse_gamepage(game_id):
     """
     gamepage_url_prefix = r'http://www.espn.com/nfl/game?gameId='
     gamepage = requests.get(gamepage_url_prefix+game_id)
+
+    # Save HTML Content of game locally
+    timestamp = datetime.datetime.today().date()
+    fname = f'game_scrapes/{game_id}_{str(timestamp)}.html'
+    f = open(f'{fname}', 'w')
+    f.write(gamepage.text)
+    f.close()
+
+
     gamepage_soup = BeautifulSoup(gamepage.content, 'lxml')
 
     return gamepage_soup
@@ -72,7 +82,9 @@ def build_game_ids_file(output_file):
             game_ids_writer.writerow([game_id, game_week, game_time])
 
 
-build_game_ids_file('game_ids_2018.csv')
+# build_game_ids_file('game_ids_2018.csv')
+
+parse_gamepage('400874541')
 
 moo = 'boo'
 

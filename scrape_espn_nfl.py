@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
+import csv
 import lxml
 import requests
 
@@ -38,23 +39,40 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix+game_id)
     gamepage_soup = BeautifulSoup(gamepage.content, 'lxml')
 
-
-
     return gamepage_soup
 
-print('Title, GameID, Week#, Time, Home, Home Win %, Away, Away Win %')
-for game_id, week, time in get_game_ids():
-    game = parse_gamepage(game_id)
 
-    game_title = game.find_all('title')[0].text
+def print_games():
+    print('Title, GameID, Week#, Time, Home, Home Win %, Away, Away Win %')
+    for game_id, week, time in get_game_ids():
+        game = parse_gamepage(game_id)
 
-    home_team = game.find('span', {'class': 'home-team'}).text
-    away_team = game.find('span', {'class': 'away-team'}).text
+        game_title = game.find_all('title')[0].text
 
-    home_win_pct = game.find('span', {'class': 'value-home'}).text
-    away_win_pct = game.find('span', {'class': 'value-away'}).text
+        home_team = game.find('span', {'class': 'home-team'}).text
+        away_team = game.find('span', {'class': 'away-team'}).text
 
-    print(f'{game_title}, {game_id}, {week}, {time}, {home_team}, '
-          f'{home_win_pct}, {away_team}, {away_win_pct}')
+        home_win_pct = game.find('span', {'class': 'value-home'}).text
+        away_win_pct = game.find('span', {'class': 'value-away'}).text
+
+        print(f'{game_title}, {game_id}, {week}, {time}, {home_team}, '
+              f'{home_win_pct}, {away_team}, {away_win_pct}')
+
+def build_game_ids_file(output_file):
+    col_headers = ['GameID', 'Week', 'Time']
+
+    with open(output_file, mode='w') as game_ids_file:
+        game_ids_writer = csv.writer(
+            game_ids_file, delimiter=',',
+            quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+        game_ids_writer.writerow(col_headers)
+
+        for game_id, game_week, game_time in get_game_ids():
+            game_ids_writer.writerow([game_id, game_week, game_time])
+
+
+build_game_ids_file('game_ids_2018.csv')
+
 moo = 'boo'
 

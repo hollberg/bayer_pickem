@@ -8,14 +8,15 @@ import datetime
 
 test_game_id = '401030775'
 
-def get_game_ids():
+def get_game_ids(wk_begin: int):
     """
+    wk_begin: Integer, week of season from which to scrape
     17 weeks in season
     :return:
     """
     WEEKLY_SCHEDULE_URL_PREFIX = r'http://www.espn.com/nfl/schedule/_/week/'
 
-    for week in range(1,18):    # 17 Weeks in a season
+    for week in range(wk_begin,18):    # 17 Weeks in a season
 
         schedule_page = requests.get(WEEKLY_SCHEDULE_URL_PREFIX + str(week))
         schedule_soup = BeautifulSoup(schedule_page.content, 'lxml')
@@ -28,45 +29,6 @@ def get_game_ids():
             #print(f'{game_id}, {str(week)}')
             yield(game_id, str(week), game_time)
 
-
-def parse_gamepage(game_id):
-    """
-    Given the ESPN Game ID, navigate to game page and scrape win probability
-    and other relvant data
-    :param game_id:
-    :return:
-    """
-    gamepage_url_prefix = r'http://www.espn.com/nfl/game?gameId='
-    gamepage = requests.get(gamepage_url_prefix+game_id)
-
-    # Save HTML Content of game locally
-    timestamp = datetime.datetime.today().date()
-    fname = f'game_scrapes/{game_id}_{str(timestamp)}.html'
-    f = open(f'{fname}', 'w')
-    f.write(gamepage.text)
-    f.close()
-
-
-    gamepage_soup = BeautifulSoup(gamepage.content, 'lxml')
-
-    return gamepage_soup
-
-
-def print_games():
-    print('Title, GameID, Week#, Time, Home, Home Win %, Away, Away Win %')
-    for game_id, week, time in get_game_ids():
-        game = parse_gamepage(game_id)
-
-        game_title = game.find_all('title')[0].text
-
-        home_team = game.find('span', {'class': 'home-team'}).text
-        away_team = game.find('span', {'class': 'away-team'}).text
-
-        home_win_pct = game.find('span', {'class': 'value-home'}).text
-        away_win_pct = game.find('span', {'class': 'value-away'}).text
-
-        print(f'{game_title}, {game_id}, {week}, {time}, {home_team}, '
-              f'{home_win_pct}, {away_team}, {away_win_pct}')
 
 def build_game_ids_file(output_file):
     col_headers = ['GameID', 'Week', 'Time']
@@ -82,9 +44,53 @@ def build_game_ids_file(output_file):
             game_ids_writer.writerow([game_id, game_week, game_time])
 
 
-# build_game_ids_file('game_ids_2018.csv')
+def parse_gamepage(game_id):
+    """
+    Given the ESPN Game ID, navigate to game page and scrape win probability
+    and other relvant data
+    :param game_id:
+    :return: Beautiful Soup object of
+    """
+    gamepage_url_prefix = r'http://www.espn.com/nfl/game?gameId='
+    gamepage = requests.get(gamepage_url_prefix + game_id)
 
-parse_gamepage('400874541')
+    # Save HTML Content of game locally
+    timestamp = datetime.datetime.today().date()
+    fname = f'game_scrapes/wk4/{game_id}_{str(timestamp)}.html'
+    with open(f'{fname}', 'w') as fh:
+        fh.write(gamepage.text)
+        fh.close()
+
+    gamepage_soup = BeautifulSoup(gamepage.content, 'lxml')
+    return gamepage_soup
+
+
+def print_games(wk_begin: int = 1):
+    """
+    :param wk_begin: Integer; first week of data to collect
+    :return:
+    """
+    print('Title, GameID, Week#, Time, Home, Home Win %, Away, Away Win %')
+    for game_id, week, time in get_game_ids(wk_begin):
+        game = parse_gamepage(game_id)
+
+        game_title = game.find_all('title')[0].text
+
+        home_team = game.find('span', {'class': 'home-team'}).text
+        away_team = game.find('span', {'class': 'away-team'}).text
+
+        # NOTE: Home/Away win Percentages MISLABLED in ESPN's HTML;
+        # Thus assign home_win_pct to the "value-away" class and vice versa!
+        home_win_pct = game.find('span', {'class': 'value-away'}).text
+        away_win_pct = game.find('span', {'class': 'value-home'}).text
+
+        print(f'{game_title}, {game_id}, {week}, {time}, {home_team}, '
+              f'{home_win_pct}, {away_team}, {away_win_pct}')
+
+
+# build_game_ids_file('game_ids_2018.csv')
+# **Run "print_games(wk_num) below to update**
+print_games(4)
 
 moo = 'boo'
 

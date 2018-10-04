@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import lxml
 
 
-def get_results(wk_num: int = 1):
+def get_game_results(wk_num: int = 1):
     """
     Scrape game results for completed weeks
     :param wk_num: The week of the season for which to pull results
@@ -12,11 +12,11 @@ def get_results(wk_num: int = 1):
     RESULTS_URL_PREFIX = 'http://www.espn.com/nfl/schedule/_/week/'
 
     result_page = requests.get(RESULTS_URL_PREFIX + str(wk_num))
-    result_soup = BeautifulSoup(result_page.content, 'lxml')
+    game_result_soup = BeautifulSoup(result_page.content, 'lxml')
 
     # Looking for <a> links like:
     # <a name="&lpos=nfl:schedule:score" href="/nfl/game?gameId=401030710">PHI 18, ATL 12</a>
-    for a in result_soup.findAll('a', {'name' : '&lpos=nfl:schedule:score'}):
+    for a in game_result_soup.findAll('a', {'name' : '&lpos=nfl:schedule:score'}):
         # <a> text of format "CIN 34, IND 23"
         res_text = a.text.replace(',','')   # Remove Comma
         game_id = a.attrs['href'].replace('/nfl/game?gameId=','')
@@ -35,20 +35,20 @@ def get_results(wk_num: int = 1):
             team1_result = 'L'
             team2_result = 'W'
 
-        result = dict()
-        result['game_id'] = game_id
-        result['game_week'] = str(wk_num)
-        result['team1'] = {'name': team1,
+        game_result = dict()
+        game_result['game_id'] = game_id
+        game_result['game_week'] = str(wk_num)
+        game_result['team1'] = {'name': team1,
                            'result': team1_result,
                            'score': team1_score}
-        result['team2'] = {'name': team2,
+        game_result['team2'] = {'name': team2,
                            'result': team2_result,
                            'score': team2_score}
 
-        yield result
+        yield game_result
 
 
-def print_results():
+def print_game_results():
     print(f'game_id, game_week, team_name, team_result, team_score')
     for week in range(1,5):
         for game in get_results(week):
@@ -68,8 +68,6 @@ def get_powerrank():
     rank_page = requests.get('https://thepowerrank.com/nfl/')
     rank_soup = BeautifulSoup(rank_page.content, 'lxml')
 
-    chart = rank_soup('div', {'id': 'chart'})
-
     print(f'team_rank,team_name,team_power,team_record')
     for i in range(1,33):
         ranking_row = rank_soup.findAll('tr')[i].findAll('td')
@@ -78,12 +76,6 @@ def get_powerrank():
         team_power = ranking_row[2].text
         team_record = ranking_row[3].text
         print(f'{team_rank},{team_name},{team_power},{team_record}')
-
-
-
-
-    moo = 'boo'
-    return moo
 
 
 get_powerrank()

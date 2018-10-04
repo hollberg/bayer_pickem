@@ -69,6 +69,19 @@ def get_powerrank():
     rank_soup = BeautifulSoup(rank_page.content, 'lxml')
 
     chart = rank_soup('div', {'id': 'chart'})
+
+    print(f'team_rank,team_name,team_power,team_record')
+    for i in range(1,33):
+        ranking_row = rank_soup.findAll('tr')[i].findAll('td')
+        team_rank = ranking_row[0].text
+        team_name = ranking_row[1].text
+        team_power = ranking_row[2].text
+        team_record = ranking_row[3].text
+        print(f'{team_rank},{team_name},{team_power},{team_record}')
+
+
+
+
     moo = 'boo'
     return moo
 

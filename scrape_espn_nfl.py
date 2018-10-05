@@ -92,5 +92,5 @@ def print_games(wk_begin: int = 1):
 # **Run "print_games(wk_num) below to update**
 print_games(1)
 
-moo = 'bool'
+moo = 'bools'
 

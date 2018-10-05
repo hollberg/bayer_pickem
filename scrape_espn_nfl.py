@@ -56,7 +56,7 @@ def parse_gamepage(game_id):
 
     # Save HTML Content of game locally
     timestamp = datetime.datetime.today().date()
-    fname = f'game_scrapes/wk4/{game_id}_{str(timestamp)}.html'
+    fname = f'game_scrapes/wk5/{game_id}_{str(timestamp)}.html'
     with open(f'{fname}', 'w') as fh:
         fh.write(gamepage.text)
         fh.close()
@@ -84,13 +84,13 @@ def print_games(wk_begin: int = 1):
         home_win_pct = game.find('span', {'class': 'value-away'}).text
         away_win_pct = game.find('span', {'class': 'value-home'}).text
 
-        print(f'{game_title}, {game_id}, {week}, {time}, {home_team}, '
-              f'{home_win_pct}, {away_team}, {away_win_pct}')
+        print(f'{game_title},{game_id},{week},{time},{home_team},\
+              {home_win_pct},{away_team},{away_win_pct}')
 
 
 # build_game_ids_file('game_ids_2018.csv')
 # **Run "print_games(wk_num) below to update**
-print_games(4)
+print_games(1)
 
-moo = 'boo'
+moo = 'bool'
 

@@ -8,7 +8,7 @@ import datetime
 
 test_game_id = '401030775'
 
-def get_game_ids(wk_begin: int):
+def get_game_ids(wk_begin: int = 1):
     """
     wk_begin: Integer, week of season from which to scrape
     17 weeks in season
@@ -25,6 +25,7 @@ def get_game_ids(wk_begin: int):
         # <a data-dateformat="time1" name="xxx" href="/nfl/game?gameId=401030690">8:20 PM</a>
         for a in schedule_soup.findAll('a',attrs={'data-dateformat':'time1'}):
             game_id = a['href'].replace('/nfl/game?gameId=', '')
+            game_id = game_id.replace('/nfl/game/_/gameId/', '')    # Alternate URL prefix to clean
             game_time = str(a.parent['data-date'])
             #print(f'{game_id}, {str(week)}')
             yield(game_id, str(week), game_time)
@@ -44,6 +45,17 @@ def build_game_ids_file(output_file):
             game_ids_writer.writerow([game_id, game_week, game_time])
 
 
+def save_html_locally(dir_path:str, game_id:str, html):
+    """Save the HTML of the current page"""
+    timestamp = datetime.datetime.today().date()
+    fname = f'{dir_path}/{game_id}_{str(timestamp)}.html'
+    with open(f'{fname}', 'w') as fh:
+        fh.write(html)
+        fh.close()
+
+    return True
+
+
 def parse_gamepage(game_id):
     """
     Given the ESPN Game ID, navigate to game page and scrape win probability
@@ -55,11 +67,14 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    timestamp = datetime.datetime.today().date()
-    fname = f'game_scrapes/wk5/{game_id}_{str(timestamp)}.html'
-    with open(f'{fname}', 'w') as fh:
-        fh.write(gamepage.text)
-        fh.close()
+    save_html_locally(dir_path='game_scrapes/wk8/',
+                      game_id=game_id,
+                      html = gamepage.text)
+    # timestamp = datetime.datetime.today().date()
+    # fname = f'game_scrapes/wks_all/{game_id}_{str(timestamp)}.html'
+    # with open(f'{fname}', 'w') as fh:
+    #     fh.write(gamepage.text)
+    #     fh.close()
 
     gamepage_soup = BeautifulSoup(gamepage.content, 'lxml')
     return gamepage_soup
@@ -79,7 +94,7 @@ def print_games(wk_begin: int = 1):
         home_team = game.find('span', {'class': 'home-team'}).text
         away_team = game.find('span', {'class': 'away-team'}).text
 
-        # NOTE: Home/Away win Percentages MISLABLED in ESPN's HTML;
+        # NOTE: Home/Away win Percentages MISLABELED in ESPN's HTML;
         # Thus assign home_win_pct to the "value-away" class and vice versa!
         home_win_pct = game.find('span', {'class': 'value-away'}).text
         away_win_pct = game.find('span', {'class': 'value-home'}).text
@@ -90,7 +105,11 @@ def print_games(wk_begin: int = 1):
 
 # build_game_ids_file('game_ids_2018.csv')
 # **Run "print_games(wk_num) below to update**
-print_games(1)
+print_games(7)
+
+# for entry in get_game_ids(1):
+#     print(entry)
+
 
 moo = 'bools'
 

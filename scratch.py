@@ -1,6 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
 import lxml
+import datetime
+
+
+def save_html_locally(dir_path: str, game_id: str, html):
+    """Save the HTML of the current page"""
+    timestamp = datetime.datetime.today().date()
+    fname = f'{dir_path}/{game_id}_{str(timestamp)}.html'
+    with open(f'{fname}', 'w') as fh:
+        fh.write(html)
+        fh.close()
+
+    return True
 
 
 def get_game_results(wk_num: int = 1):
@@ -20,6 +32,7 @@ def get_game_results(wk_num: int = 1):
         # <a> text of format "CIN 34, IND 23"
         res_text = a.text.replace(',','')   # Remove Comma
         game_id = a.attrs['href'].replace('/nfl/game?gameId=','')
+        game_id = game_id.replace('/nfl/game/_/gameId/', '')  # Alternate URL prefix to clean
         team1, team1_score, team2, team2_score = res_text.split()[0:4]
         team1_score = int(team1_score)
         team2_score = int(team2_score)
@@ -45,13 +58,17 @@ def get_game_results(wk_num: int = 1):
                            'result': team2_result,
                            'score': team2_score}
 
+        save_html_locally(dir_path='game_scrapes/wk8',
+                          game_id=game_id,
+                          html=game_result_soup.text)
+
         yield game_result
 
 
 def print_game_results():
     print(f'game_id, game_week, team_name, team_result, team_score')
-    for week in range(1,5):
-        for game in get_results(week):
+    for week in range(1,8):
+        for game in get_game_results(week):
             # print(game)
             print(f"{game['game_id']},{game['game_week']},{game['team1']['name']},"
                   f"{game['team1']['result']},{game['team1']['score']}")
@@ -78,5 +95,6 @@ def get_powerrank():
         print(f'{team_rank},{team_name},{team_power},{team_record}')
 
 
-get_powerrank()
+# get_powerrank()
+print_game_results()
 

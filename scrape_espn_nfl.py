@@ -67,7 +67,7 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    save_html_locally(dir_path='game_scrapes/wk8/',
+    save_html_locally(dir_path='game_scrapes/wk9/',
                       game_id=game_id,
                       html = gamepage.text)
     # timestamp = datetime.datetime.today().date()
@@ -105,7 +105,7 @@ def print_games(wk_begin: int = 1):
 
 # build_game_ids_file('game_ids_2018.csv')
 # **Run "print_games(wk_num) below to update**
-print_games(7)
+print_games(8)
 
 # for entry in get_game_ids(1):
 #     print(entry)

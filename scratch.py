@@ -67,7 +67,7 @@ def get_game_results(wk_num: int = 1):
 
 def print_game_results():
     print(f'game_id, game_week, team_name, team_result, team_score')
-    for week in range(1,8):
+    for week in range(1,9):
         for game in get_game_results(week):
             # print(game)
             print(f"{game['game_id']},{game['game_week']},{game['team1']['name']},"
@@ -95,6 +95,6 @@ def get_powerrank():
         print(f'{team_rank},{team_name},{team_power},{team_record}')
 
 
-# get_powerrank()
-print_game_results()
+get_powerrank()
+# print_game_results()
 

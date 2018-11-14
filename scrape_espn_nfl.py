@@ -3,6 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import csv
 import lxml
+import openpyxl
 import requests
 import datetime
 
@@ -67,7 +68,7 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    save_html_locally(dir_path='game_scrapes/wk9/',
+    save_html_locally(dir_path='game_scrapes/wk11/',
                       game_id=game_id,
                       html = gamepage.text)
     # timestamp = datetime.datetime.today().date()
@@ -103,13 +104,36 @@ def print_games(wk_begin: int = 1):
               {home_win_pct},{away_team},{away_win_pct}')
 
 
+def stack_submissions():
+    """kasdkdk
+    """
+    submission_xl = r'C:\Users\mitchell.hollberg\Dropbox\DropBoxDocs\Family\William Activities\Football\casey_file.xlsx'
+    df = pd.read_excel(submission_xl)
+    df.set_index('Person', inplace=True)
+
+    # Replace blanks with NaNs
+    df.replace(to_replace = '', value=np.nan, inplace=True)
+    # Replace 'X' values with week 17 (will never count)
+    df.replace(to_replace = 'X', value=17, inplace=True)
+    # df.index = df.index.set_names(['Person', 'Team'])
+    df_out = df.stack(dropna=True).to_frame()
+    df_out.index = df_out.index.set_names(['Person', 'Team'])
+    df_out.columns = ['Week']
+
+    xl_writer = pd.ExcelWriter('stacked_picks.xlsx')
+    df_out.to_excel(xl_writer, merge_cells=False)
+    xl_writer.save()
+
+
 # build_game_ids_file('game_ids_2018.csv')
 # **Run "print_games(wk_num) below to update**
-print_games(8)
+print_games(10)
+
+# stack_submissions()
+
+
 
 # for entry in get_game_ids(1):
 #     print(entry)
 
-
-moo = 'bools'
 

@@ -1,15 +1,18 @@
+"""
+scrape2.py
+Scrape Game Forecast Data, output to Excel and/or *.csv
+"""
+
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
 import csv
+import os
 import lxml
 import openpyxl
 import requests
 import datetime
 
-import scratch
-
-test_game_id = '401030775'
 
 def get_game_ids(wk_begin: int = 1):
     """
@@ -34,20 +37,6 @@ def get_game_ids(wk_begin: int = 1):
             yield(game_id, str(week), game_time)
 
 
-def build_game_ids_file(output_file):
-    col_headers = ['GameID', 'Week', 'Time']
-
-    with open(output_file, mode='w') as game_ids_file:
-        game_ids_writer = csv.writer(
-            game_ids_file, delimiter=',',
-            quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-        game_ids_writer.writerow(col_headers)
-
-        for game_id, game_week, game_time in get_game_ids():
-            game_ids_writer.writerow([game_id, game_week, game_time])
-
-
 def save_html_locally(dir_path:str, game_id:str, html):
     """Save the HTML of the current page"""
     timestamp = datetime.datetime.today().date()
@@ -70,7 +59,7 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    save_html_locally(dir_path='game_scrapes/wk11/',
+    save_html_locally(dir_path='game_scrapes/wk_x/',
                       game_id=game_id,
                       html = gamepage.text)
     # timestamp = datetime.datetime.today().date()
@@ -82,19 +71,6 @@ def parse_gamepage(game_id):
     gamepage_soup = BeautifulSoup(gamepage.content, 'lxml')
     return gamepage_soup
 
-
-def get_game_results(week_begin: int, week_end: int):
-    col_heading = ['game_id, game_week, team_name, team_result, team_score']
-    for week in range(week_begin, week_end):
-        for game in scratch.get_game_results(week):
-
-            result_dict = dict()
-            result_dict['team1'] = (game['game_id'],game['game_week'],game['team1']['name'],
-                  game['team1']['result'],game['team1']['score'])
-            result_dict['team2'] = (game['game_id'],game['game_week'],game['team2']['name'],
-                  game['team2']['result'],game['team2']['score'])
-
-    yield result_dict
 
 def get_games(wk_begin: int = 1):
     """
@@ -143,64 +119,22 @@ def make_forecast_file(week_begin: int, filename: str):
     col_names = ['Game Title', 'game_id', 'week', 'time', 'home_team',
                  'home_win_pct', 'away_team', 'away_win_pct']
 
-    df_raw_games = tuples_to_df(get_games(wk_begin=week_begin), col_names=col_names)
+    df_raw_games = tuples_to_df(get_games(wk_begin=week_begin),col_names=col_names)
+    print(df_raw_games.head())
 
     # Make copy, dropping the "Away" team columns
-    df_home = df_raw_games.drop(labels=['away_team', 'away_win_pct'], axis=1)
+    df_home = df_raw_games.drop(labels=['away_team', 'away_win_pct'], axis = 1)
     df_home['IsHome'] = 1
     df_home.rename(index=str, columns={'home_team': 'team', 'home_win_pct': 'win_pct'}, inplace=True)
 
     # Make copy, dropping the "Home" team columns
-    df_away = df_raw_games.drop(labels=['home_team', 'home_win_pct'], axis=1)
+    df_away = df_raw_games.drop(labels=['home_team', 'home_win_pct'], axis = 1)
     df_away['IsHome'] = 0
     df_away.rename(index=str, columns={'away_team': 'team', 'away_win_pct': 'win_pct'}, inplace=True)
 
     # Append "Home" and "Away" dataframes
     df_forecasts = df_home.append(df_away)
-    df_forecasts.set_index('game_id', inplace=True)
 
     df_forecasts.to_excel(filename)
 
-
-def stack_submissions():
-    """kasdkdk
-    """
-    submission_xl = r'C:\Users\mitchell.hollberg\Dropbox\DropBoxDocs\Family\William Activities\Football\PICKEM11.xlsx'
-    df = pd.read_excel(submission_xl)
-    df.set_index('Person', inplace=True)
-
-    # Replace blanks with NaNs
-    df.replace(to_replace = '', value=np.nan, inplace=True)
-    # Replace 'X' values with week 17 (will never count)
-    df.replace(to_replace = 'X', value=17, inplace=True)
-    # df.index = df.index.set_names(['Person', 'Team'])
-    df_out = df.stack(dropna=True).to_frame()
-    df_out.index = df_out.index.set_names(['Person', 'Team'])
-    df_out.columns = ['Week']
-
-    xl_writer = pd.ExcelWriter('stacked_picks.xlsx')
-    df_out.to_excel(xl_writer, merge_cells=False)
-    xl_writer.save()
-
-
-# build_game_ids_file('game_ids_2018.csv')
-# **Run "print_games(wk_num) below to update**
-## make_forecast_file(17, 'myfile.xlsx')
-
-
-
-stack_submissions()
-
-# for entry in get_game_ids(1):
-#     print(entry)
-
-# results_list = []
-# for entry in get_game_results(9,11):
-#     moo = 'boo'
-#     results_list.append(entry['team1'])
-#     results_list.append(entry['team2'])
-#
-# df_test = pd.DataFrame(results_list)
-
-
-# print(get_game_results(9,10))
+moo = 'boo'

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import lxml
 import datetime
+import pandas as pd
 
 
 def save_html_locally(dir_path: str, game_id: str, html):
@@ -65,16 +66,25 @@ def get_game_results(wk_num: int = 1):
         yield game_result
 
 
-def print_game_results():
+def print_game_results(begin_week: int, end_week: int):
     print(f'game_id, game_week, team_name, team_result, team_score')
-    for week in range(10,11):
+
+    output_list = []
+
+    for week in range(begin_week, end_week):
         for game in get_game_results(week):
             # print(game)
             print(f"{game['game_id']},{game['game_week']},{game['team1']['name']},"
                   f"{game['team1']['result']},{game['team1']['score']}")
             print(f"{game['game_id']},{game['game_week']},{game['team2']['name']},"
                   f"{game['team2']['result']},{game['team2']['score']}")
+            output_list.append((game['game_id'], game['game_week'], game['team1']['name'],
+                                game['team1']['result'], game['team1']['score']))
+            output_list.append((game['game_id'], game['game_week'], game['team2']['name'],
+                                game['team2']['result'], game['team2']['score']))
 
+
+    return output_list
 
 
 def get_powerrank():
@@ -95,7 +105,12 @@ def get_powerrank():
         print(f'{team_rank},{team_name},{team_power},{team_record}')
 
 
+# get_powerrank()
+outlist = print_game_results(9,10)
 
-get_powerrank()
-# print_game_results()
+df_out = pd.DataFrame(outlist, columns=['game_id', 'week_num', 'team', 'Result', 'Score'])
+df_out.set_index('game_id', inplace=True)
+df_out.to_excel('game_results.xlsx')
 
+
+moo='boo'

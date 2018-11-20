@@ -106,7 +106,7 @@ def get_powerrank():
 
 
 # get_powerrank()
-outlist = print_game_results(9,10)
+outlist = print_game_results(11,12)
 
 df_out = pd.DataFrame(outlist, columns=['game_id', 'week_num', 'team', 'Result', 'Score'])
 df_out.set_index('game_id', inplace=True)

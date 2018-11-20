@@ -189,7 +189,7 @@ def stack_submissions():
 
 
 
-stack_submissions()
+###stack_submissions()
 
 # for entry in get_game_ids(1):
 #     print(entry)
@@ -203,4 +203,4 @@ stack_submissions()
 # df_test = pd.DataFrame(results_list)
 
 
-# print(get_game_results(9,10))
+print(get_game_results(10,11))

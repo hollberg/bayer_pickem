@@ -40,8 +40,8 @@ def get_game_ids(wk_begin: int = 1):
 def save_html_locally(dir_path:str, game_id:str, html):
     """Save the HTML of the current page"""
     timestamp = datetime.datetime.today().date()
-    fname = f'{dir_path}/{game_id}_{str(timestamp)}.html'
-    with open(f'{fname}', 'w') as fh:
+    fname = os.path.abspath(f'{dir_path}/{game_id}_{str(timestamp)}.html')
+    with open(fname, 'w') as fh:
         fh.write(html)
         fh.close()
 
@@ -59,7 +59,7 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    save_html_locally(dir_path='game_scrapes/wk_x/',
+    save_html_locally(dir_path='game_scrapes/wk12',
                       game_id=game_id,
                       html = gamepage.text)
     # timestamp = datetime.datetime.today().date()
@@ -138,3 +138,5 @@ def make_forecast_file(week_begin: int, filename: str):
     df_forecasts.to_excel(filename)
 
 moo = 'boo'
+
+make_forecast_file(11,'forecast11.xlsx')

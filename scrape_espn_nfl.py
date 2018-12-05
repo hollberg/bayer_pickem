@@ -70,7 +70,7 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    save_html_locally(dir_path='game_scrapes/wk11/',
+    save_html_locally(dir_path='game_scrapes/wk14/',
                       game_id=game_id,
                       html = gamepage.text)
     # timestamp = datetime.datetime.today().date()
@@ -94,7 +94,7 @@ def get_game_results(week_begin: int, week_end: int):
             result_dict['team2'] = (game['game_id'],game['game_week'],game['team2']['name'],
                   game['team2']['result'],game['team2']['score'])
 
-    yield result_dict
+            yield result_dict
 
 def get_games(wk_begin: int = 1):
     """
@@ -165,7 +165,7 @@ def make_forecast_file(week_begin: int, filename: str):
 def stack_submissions():
     """kasdkdk
     """
-    submission_xl = r'C:\Users\mitchell.hollberg\Dropbox\DropBoxDocs\Family\William Activities\Football\PICKEM11.xlsx'
+    submission_xl = r'pickswk13.xlsx'
     df = pd.read_excel(submission_xl)
     df.set_index('Person', inplace=True)
 
@@ -189,18 +189,21 @@ def stack_submissions():
 
 
 
-###stack_submissions()
+stack_submissions()
 
 # for entry in get_game_ids(1):
 #     print(entry)
 
 # results_list = []
-# for entry in get_game_results(9,11):
+# for entry in get_game_results(13,14):
 #     moo = 'boo'
 #     results_list.append(entry['team1'])
 #     results_list.append(entry['team2'])
 #
 # df_test = pd.DataFrame(results_list)
-
-
-print(get_game_results(10,11))
+# df_test.to_excel('results.xlsx')
+#
+#
+# # print(get_game_results(12,13))
+#
+# #make_forecast_file(13, 'forecasts.xlsx')

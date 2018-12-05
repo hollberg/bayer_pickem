@@ -106,11 +106,11 @@ def get_powerrank():
 
 
 # get_powerrank()
-outlist = print_game_results(11,12)
-
-df_out = pd.DataFrame(outlist, columns=['game_id', 'week_num', 'team', 'Result', 'Score'])
-df_out.set_index('game_id', inplace=True)
-df_out.to_excel('game_results.xlsx')
+# outlist = print_game_results(11,12)
+#
+# df_out = pd.DataFrame(outlist, columns=['game_id', 'week_num', 'team', 'Result', 'Score'])
+# df_out.set_index('game_id', inplace=True)
+# df_out.to_excel('game_results.xlsx')
 
 
 moo='boo'

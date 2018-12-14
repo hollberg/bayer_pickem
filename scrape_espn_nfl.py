@@ -70,7 +70,7 @@ def parse_gamepage(game_id):
     gamepage = requests.get(gamepage_url_prefix + game_id)
 
     # Save HTML Content of game locally
-    save_html_locally(dir_path='game_scrapes/wk14/',
+    save_html_locally(dir_path='game_scrapes/wk15/',
                       game_id=game_id,
                       html = gamepage.text)
     # timestamp = datetime.datetime.today().date()
@@ -165,7 +165,7 @@ def make_forecast_file(week_begin: int, filename: str):
 def stack_submissions():
     """kasdkdk
     """
-    submission_xl = r'pickswk13.xlsx'
+    submission_xl = r'picks_wk15.xlsx'
     df = pd.read_excel(submission_xl)
     df.set_index('Person', inplace=True)
 
@@ -206,4 +206,4 @@ stack_submissions()
 #
 # # print(get_game_results(12,13))
 #
-# #make_forecast_file(13, 'forecasts.xlsx')
+# make_forecast_file(15, 'forecasts.xlsx')
